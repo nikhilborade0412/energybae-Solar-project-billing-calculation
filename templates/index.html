@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energybae — Solar Load Calculator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Loading overlay */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(15, 32, 39, 0.92);
+            z-index: 999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #loadingOverlay.show { display: flex; }
+
+        .big-spinner {
+            width: 70px; height: 70px;
+            border: 7px solid rgba(255,255,255,0.15);
+            border-top-color: #f39c12;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 28px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .loading-title {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .loading-sub {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+        }
+        .loading-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+        }
+        .lstep {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #666;
+            font-size: 0.88rem;
+            transition: color 0.4s;
+        }
+        .lstep.active { color: #f39c12; }
+        .lstep.done   { color: #27ae60; }
+        .lstep-icon { font-size: 1.1rem; width: 24px; text-align: center; }
+        .lstep-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #444;
+            flex-shrink: 0;
+        }
+        .lstep.active .lstep-dot { background: #f39c12; }
+        .lstep.done   .lstep-dot { background: #27ae60; }
+    </style>
+</head>
+<body>
+
+<!-- Loading overlay — shown after form submit -->
+<div id="loadingOverlay">
+    <div class="big-spinner"></div>
+    <div class="loading-title">Analysing your electricity bill…</div>
+    <div class="loading-sub">This takes 10–20 seconds. Please wait.</div>
+    <div class="loading-steps">
+        <div class="lstep" id="ls1"><div class="lstep-dot"></div> Reading bill with Gemini AI</div>
+        <div class="lstep" id="ls2"><div class="lstep-dot"></div> Extracting key fields</div>
+        <div class="lstep" id="ls3"><div class="lstep-dot"></div> Calculating solar sizing with Groq</div>
+        <div class="lstep" id="ls4"><div class="lstep-dot"></div> Generating Excel report</div>
+    </div>
+</div>
+
+<div class="card">
+
+    <div class="header">
+        <div class="logo">⚡ ENERGY<span>BAE</span></div>
+        <div class="subtitle">Solar Load Calculator — Upload Bill → Get Excel Report</div>
+    </div>
+
+    <div class="steps">
+        <div class="step"><div class="step-num">1</div>Upload Bill</div>
+        <div class="step"><div class="step-num">2</div>AI Reads Data</div>
+        <div class="step"><div class="step-num">3</div>Calculate Solar</div>
+        <div class="step"><div class="step-num">4</div>Download Excel</div>
+    </div>
+
+    {% if error %}
+    <div class="error">❌ {{ error }}</div>
+    {% endif %}
+
+    <form action="/process" method="POST" enctype="multipart/form-data" id="billForm">
+
+        <label class="upload-label" for="bill">
+            <div class="upload-icon" id="uploadIcon">📄</div>
+            <div class="upload-text" id="uploadText">Click here to select your electricity bill</div>
+            <div class="upload-sub" id="uploadSub">Supports PDF, JPG, PNG — MSEDCL / Maharashtra bills</div>
+        </label>
+
+        <input type="file" id="bill" name="bill" accept=".pdf,.jpg,.jpeg,.png" required
+            onchange="
+                var n = this.files[0].name;
+                document.getElementById('uploadIcon').textContent = '✅';
+                document.getElementById('uploadText').textContent = n;
+                document.getElementById('uploadText').style.color = '#27ae60';
+                document.getElementById('uploadSub').textContent = 'File ready — click the button below';
+            ">
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+            🔍 Extract Data &amp; Calculate Solar
+        </button>
+
+    </form>
+
+</div>
+
+<script>
+    document.getElementById('billForm').addEventListener('submit', function(e) {
+        if (!document.getElementById('bill').files.length) return;
+
+        // Show overlay
+        document.getElementById('loadingOverlay').classList.add('show');
+        document.getElementById('submitBtn').disabled = true;
+
+        // Animate steps one by one
+        var steps = ['ls1','ls2','ls3','ls4'];
+        var delays = [0, 4000, 9000, 14000];
+        steps.forEach(function(id, i) {
+            setTimeout(function() {
+                // Mark previous as done
+                if (i > 0) document.getElementById(steps[i-1]).className = 'lstep done';
+                document.getElementById(id).className = 'lstep active';
+            }, delays[i]);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energybae — Solar Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .dl-section { display:flex; flex-direction:column; gap:12px; margin-top:24px; }
+        .btn-dl-ind {
+            display:block; text-align:center; padding:14px 20px;
+            background:linear-gradient(135deg,#27ae60,#1e8449);
+            color:#fff; font-weight:700; font-size:1rem;
+            border-radius:10px; text-decoration:none; transition:.2s;
+        }
+        .btn-dl-ind:hover { opacity:.9; transform:translateY(-1px); }
+        .btn-dl-mst {
+            display:block; text-align:center; padding:14px 20px;
+            background:linear-gradient(135deg,#2980b9,#1a5276);
+            color:#fff; font-weight:700; font-size:1rem;
+            border-radius:10px; text-decoration:none; transition:.2s;
+        }
+        .btn-dl-mst:hover { opacity:.9; transform:translateY(-1px); }
+        .btn-sub { font-size:.75rem; font-weight:400; opacity:.85;
+                   display:block; margin-top:3px; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="header">
+        <div class="logo">⚡ ENERGY<span>BAE</span></div>
+        <div class="subtitle">Solar System Recommendation</div>
+    </div>
+
+    <div class="solar-box">
+        <div class="solar-kw">{{ solar.recommended_kw }} kW</div>
+        <div class="solar-lbl">☀️ Recommended Solar System Size</div>
+    </div>
+
+    <div class="section-title">📋 Extracted Bill Data &amp; Solar Analysis</div>
+    <div class="data-grid">
+        <div class="data-col">
+            <h3>Customer Info</h3>
+            <div class="row"><span class="lbl">Name</span>          <span class="val">{{ bill.consumer_name or '—' }}</span></div>
+            <div class="row"><span class="lbl">Consumer No.</span>  <span class="val">{{ bill.consumer_number or '—' }}</span></div>
+            <div class="row"><span class="lbl">Billing Month</span> <span class="val">{{ bill.billing_month or '—' }}</span></div>
+            <div class="row"><span class="lbl">Tariff</span>        <span class="val">{{ bill.tariff_category or '—' }}</span></div>
+            <div class="row"><span class="lbl">Connection</span>    <span class="val">{{ bill.connection_type or '—' }}</span></div>
+            <div class="row"><span class="lbl">Total Bill</span>
+                <span class="val">{% if bill.total_bill_amount %}₹ {{ "{:,.0f}".format(bill.total_bill_amount) }}{% else %}—{% endif %}</span>
+            </div>
+        </div>
+        <div class="data-col">
+            <h3>Solar Analysis</h3>
+            <div class="row"><span class="lbl">Units Consumed</span>  <span class="val">{{ bill.units_consumed or 0 }} kWh</span></div>
+            <div class="row"><span class="lbl">Daily Average</span>   <span class="val">{{ solar.daily_units }} kWh/day</span></div>
+            <div class="row"><span class="lbl">No. of Panels</span>   <span class="val">{{ solar.num_panels }} × 400W</span></div>
+            <div class="row"><span class="lbl">Est. Cost</span>       <span class="val">₹ {{ "{:,.0f}".format(solar.estimated_cost) }}</span></div>
+            <div class="row"><span class="lbl">Annual Savings</span>  <span class="val">₹ {{ "{:,.0f}".format(solar.annual_savings) }} / yr</span></div>
+            <div class="row"><span class="lbl">Payback Period</span>  <span class="val">{{ solar.payback_years }} years</span></div>
+        </div>
+    </div>
+
+    <div class="dl-section">
+        <a class="btn-dl-ind" href="{{ url_for('main.download', filename=ind_filename) }}">
+            📥 Download This Report
+            <span class="btn-sub">This consumer pair only — fresh file</span>
+        </a>
+        <a class="btn-dl-mst" href="{{ url_for('main.download', filename=combined_filename) }}">
+            📊 Download Master File
+            <span class="btn-sub">All uploads combined — consumers added side by side</span>
+        </a>
+    </div>
+
+    <a class="back-link" href="/">← Process another bill</a>
+</div>
+</body>
+</html>
