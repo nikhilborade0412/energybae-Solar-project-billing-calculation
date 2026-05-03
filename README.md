@@ -37,8 +37,8 @@ energybae_v4/
 ├── static/
 │   └── css/style.css        ← All styles
 │
-├── outputs/                 ← Generated Excel files saved here (auto-created)
-└── uploads/                 ← Temp folder (auto-created)
+└── outputs/                 ← Generated Excel files saved here (auto-created)
+ 
 ```
 
 ---
