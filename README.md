@@ -123,9 +123,3 @@ http://localhost:5000
 - If uploaded file is not an electricity bill → warning shown, no Excel generated
 - If units consumed not found in bill → clear error message shown
 - Friendly error pages for all server errors (no blank browser error pages)
-
----
-
-Built for: Energybae AI Intern Task
-Email: pranay@energybae.in | WhatsApp: +91 9112233120
-www.energybae.in
